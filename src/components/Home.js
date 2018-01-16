@@ -6,7 +6,7 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
 export default class Home extends Component {
@@ -35,17 +35,17 @@ export default class Home extends Component {
 
   render() {
     return (
-      <View>
-        <View style={{ margin: 35, marginTop: 100 }}>
+      <View style={styles.container}>
+        <View>
           <TextInput
             placeholder='new task'
             value={this.state.todoText}
-            style={{height: 40, width: 300, borderColor: 'gray', padding: 5, borderWidth: 1}}
+            style={styles.textInput}
             onChangeText={this._todoTextChange.bind(this)}
           />
           <Button title='Add' onPress={this.addTask.bind(this)}/>
         </View>
-        <View style={{ margin: 35 }}>
+        <View>
           {this.state.todos.map((todo, i) =>
             <TouchableOpacity key={i} onPress={this.removeTodo.bind(this, i)}>
               <Text> x | {todo}</Text>
@@ -56,3 +56,18 @@ export default class Home extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    margin: 35,
+    marginTop: 100,
+  },
+
+  textInput: {
+    height: 40,
+    width: 300,
+    borderColor: 'gray',
+    padding: 5,
+    borderWidth: 1,
+  }
+})
