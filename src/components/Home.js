@@ -8,20 +8,39 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Rebase from 're-base'
+import firebase from 'firebase'
+import firebaseConfig from './firebaseConfig'
+
+const app = firebase.initializeApp(firebaseConfig);
+
+const base = Rebase.createClass(app.database());
 
 export default class Home extends Component {
 
   constructor() {
     super()
     this.state = {
-      todos: [],
+      tasks: [],
       todoText: ''
     }
   }
 
+  componentDidMount(){
+    this.ref = base.syncState('tasks', {
+      context: this,
+      state: 'tasks',
+      asArray: true
+    });
+  }
+
+  componentWillUnmount(){
+    base.removeBinding(this.ref);
+  }
+
   addTask() {
-    const todos = [...this.state.todos, this.state.todoText]
-    this.setState({todos, todoText: ''})
+    const tasks = [...this.state.tasks, { body: this.state.todoText }]
+    this.setState({tasks, todoText: ''})
   }
 
   _todoTextChange(todoText){
@@ -29,8 +48,11 @@ export default class Home extends Component {
   }
 
   removeTodo(index) {
-    const todos = this.state.todos.splice(index, 1)
-    this.setState(todos)
+    const tasks = this.state.tasks.splice(index, 1)
+    this.setState(tasks)
+    base.post('tasks', {
+      data: this.state.tasks
+    })
   }
 
   render() {
@@ -47,10 +69,10 @@ export default class Home extends Component {
             <Text style={styles.buttonText}>Add</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.todos}>
-          {this.state.todos.map((todo, i) =>
+        <View style={styles.tasks}>
+          {this.state.tasks.map((todo, i) =>
             <TouchableOpacity key={i} style={styles.todo} onPress={this.removeTodo.bind(this, i)}>
-              <Text style={styles.todoText}> x  {todo}</Text>
+              <Text style={styles.todoText}> x  {todo.body}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -107,7 +129,7 @@ const styles = StyleSheet.create({
     marginBottom: 2
   },
 
-  todos: {
+  tasks: {
     marginTop: 30,
   }
 })
